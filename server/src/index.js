@@ -23,6 +23,35 @@ try{
 }
 })
 
+//calculate target amount through API
+app.get("/convertRates" , async(req,res) => {
+
+    const {
+        date,
+        sourceCurrency,
+        targetCurrency,
+        amountInsourceCurrency
+    } = req.query;
+
+    const dataURL = `https://openexchangerates.org/api/historical/${date}.json?app_id=01803395b792403b964b02cc2dcc1b38`;
+
+    try{
+        const dataResponse = await axios.get(dataURL);
+        const rates = dataResponse.data.rates;
+
+        const sourceRate = rates[sourceCurrency];
+        const targetRate = rates[targetCurrency];
+
+        //equation for finding target rate
+
+        const targetAmount = (targetRate / sourceRate) * amountInsourceCurrency;
+        return res.json(targetAmount);
+
+    }catch(err){
+        console.error(err);
+    }
+})
+
 //server listen in a port
 app.listen(5000 , ()=> {
     console.log("Server Started!");
