@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 
 export default function HomePage() {
 
@@ -9,14 +10,45 @@ export default function HomePage() {
     const [targetCurrency, setTargetCurrency] = useState("");
     const [amountInsourceCurrency, setAmountInSourceCurrency] = useState("");
     const [amountIntargetCurrency, setAmountInTargetCurrency] = useState("");
+    const [currencyNames, setCurrencyNames] = useState([]);
 
     //handleSubmit method define
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault();
-        console.log(
-            date, setAmountInSourceCurrency,targetCurrency,amountInsourceCurrency
+        try{
+            const response = await axios.get(
+                "http://localhost:5000/convertRates", {params: {
+                    date,
+                    sourceCurrency,
+                    targetCurrency,
+                    amountInsourceCurrency
+                }}
+            );
+
+            //to Do
+
+        }catch(err){
+            console.error(err);
+        }
         );
     };
+
+    //get all currency names by API
+    useEffect(()=>{
+      const getCurrencyNames = async() => {
+        try{
+
+            const response = await axios.get(
+                "http://localhost:5000/getAllCurrencies"
+            );
+            setCurrencyNames(response.data);
+
+        }catch(err){
+          console.error(err);
+        }
+      };
+      getCurrencyNames();
+    }, [])
 
     return (
         <div className='p-6'>
@@ -43,6 +75,11 @@ export default function HomePage() {
                             <label htmlFor={sourceCurrency} className="block mb-2 text-sm font-medium text-gray-900 ">Source Currency</label>
                             <select onChange={(e)=>setSourceCurrency(e.target.value)} name={sourceCurrency} id={sourceCurrency} value={sourceCurrency} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring--500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500 dark:shadow-sm-light">
                             <option value="">Select Source Currency</option>
+                            {Object.keys(currencyNames).map((currency) => (
+                                <option className='p-1' key={currency} value={currency}>
+                                    {currencyNames[currency]}
+                                </option>
+                            ))}
                             </select>
                         </div>
 
@@ -50,6 +87,11 @@ export default function HomePage() {
                             <label htmlFor={targetCurrency} className="block mb-2 text-sm font-medium text-gray-900 ">Target Currency</label>
                             <select onChange={(e)=>setTargetCurrency(e.target.value)} name={targetCurrency} id={targetCurrency} value={targetCurrency} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring--500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500 dark:shadow-sm-light">
                             <option value="">Select Target Currency</option>
+                            {Object.keys(currencyNames).map((currency) => (
+                                <option className='p-1' key={currency} value={currency}>
+                                    {currencyNames[currency]}
+                                </option>
+                            ))}
                             </select>
                         </div>
 
@@ -66,3 +108,8 @@ export default function HomePage() {
         </div>
     )
 }
+
+
+
+
+//app id - 01803395b792403b964b02cc2dcc1b38
